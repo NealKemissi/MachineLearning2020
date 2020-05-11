@@ -1,6 +1,16 @@
+#if _WIN32
+#define DLLEXPORT __declspec(dllexport)
+#else
+#define DLLEXPORT
+#endif
+
 #include <iostream>
 
+extern "C" {
+DLLEXPORT int my_add(int x, int y);
+}
+
 int main() {
-    std::cout << "Hello, World!" << std::endl;
+    std::cout << my_add(3, 7) << std::endl;
     return 0;
 }
