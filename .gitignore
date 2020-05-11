@@ -112,3 +112,7 @@ project/com_crashlytics_export_strings.xml
 project/crashlytics.properties
 project/crashlytics-build.properties
 project/fabric.properties
+
+#CMakeLists
+lib/cmake-build-debug/
+project/cmake-build-debug/

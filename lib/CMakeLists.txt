@@ -3,4 +3,5 @@ project(lib)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(lib main.cpp)
+add_library(lib SHARED main.cpp)
+add_library(lib_static STATIC main.cpp)
