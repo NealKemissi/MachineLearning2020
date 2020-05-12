@@ -11,7 +11,7 @@ extern "C" {
     DLLEXPORT int * linear_model_create(int input_dim);
     DLLEXPORT double linear_model_predict_regression(double* model, double* inputs, int inputs_size);
     DLLEXPORT double linear_model_predict_classification(double* model, double* inputs, int inputs_size);
-    DLLEXPORT double linear_model_train_classification(double* model,
+    DLLEXPORT void linear_model_train_classification(double* model,
         double** dataset_inputs,
         int dataset_length,
         int inputs_size,

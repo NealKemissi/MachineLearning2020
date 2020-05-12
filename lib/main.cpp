@@ -35,14 +35,14 @@ extern "C" {
     DLLEXPORT double linear_model_predict_regression(double* model, double* inputs, int inputs_size) {
         Vector3d v(model);
         Vector3d w(inputs);
-        return v.dot(w) + model[0];
+        return v.tail(1).dot(w) + model[0];
     }
 
     DLLEXPORT double linear_model_predict_classification(double* model, double* inputs, int inputs_size) {
         return linear_model_predict_regression(model, inputs, inputs_size) >=0 ? 1.0 : -1.0;
     }
 
-    DLLEXPORT double linear_model_train_classification(double* model,
+    DLLEXPORT void linear_model_train_classification(double* model,
             double** dataset_inputs,
             int dataset_length,
             int inputs_size,
@@ -62,8 +62,6 @@ extern "C" {
             }
 
         }
-        return 0;
-
     }
 //
 //    DLLEXPORT double linear_model_train_regression(double* model,
