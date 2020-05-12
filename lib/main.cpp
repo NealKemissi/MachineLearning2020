@@ -7,6 +7,9 @@
 #include <ctime>
 #include <cstdlib>
 #include <iostream>
+#include <Eigen/Dense>
+
+using namespace Eigen;
 
 extern "C" {
     DLLEXPORT int my_add(int x, int y) {
@@ -30,7 +33,9 @@ extern "C" {
     }
 
     DLLEXPORT double linear_model_predict_regression(double* model, double* inputs, int inputs_size) {
-        return 0;
+        Vector3d v(model);
+        Vector3d w(inputs);
+        return v.dot(w) + model[0];
     }
 
     DLLEXPORT double linear_model_predict_classification(double* model, double* inputs, int inputs_size) {
@@ -44,18 +49,31 @@ extern "C" {
             double* dataset_expected_outputs,
             int outputs_size,
             int iterations_count,
-            float alpha) {
+            bool should_plot_results,
+            float alpha = 10) {
         // TODO : train Rosenbalt
-    }
+        for (int it = 0; it < iterations_count; it++) {
+            int k = rand() % dataset_length;
+            double g_x_k = linear_model_predict_classification(model, dataset_inputs[k], dataset_length);
+            double grad = alpha * (dataset_expected_outputs[k] - g_x_k);
+            model[0] += grad * 1;
+            for (int i = 0; i < dataset_length; i++) {
+                model[i + 1] += grad * dataset_inputs[k][i];
+            }
 
-    DLLEXPORT double linear_model_train_regression(double* model,
-            double* dataset_inputs,
-            int dataset_length,
-            int inputs_size,
-            double* dataset_expected_outputs,
-            int outputs_size,
-            int iterations_count,
-            float alpha) {
-    // TODO : train PseudoInverse moore
+        }
+        return 0;
+
     }
+//
+//    DLLEXPORT double linear_model_train_regression(double* model,
+//            double* dataset_inputs,
+//            int dataset_length,
+//            int inputs_size,
+//            double* dataset_expected_outputs,
+//            int outputs_size,
+//            int iterations_count,
+//            float alpha) {
+//    // TODO : train PseudoInverse moore
+//    }
 }

@@ -61,6 +61,8 @@ project/.idea/dictionaries
 project/.idea/vcs.xml
 project/.idea/jsLibraryMappings.xml
 
+project/.idea/
+
 # Sensitive or high-churn files:
 lib/.idea/dataSources.ids
 lib/.idea/dataSources.xml
@@ -98,11 +100,11 @@ project/out/
 # mpeltonen/sbt-idea plugin
 lib/.idea_modules/
 project/.idea_modules/
-
+project/cmake-build-debug/
 # JIRA plugin
 lib/atlassian-ide-plugin.xml
 project/atlassian-ide-plugin.xml
-
+lib/.idea/sonarlint/
 # Crashlytics plugin (for Android Studio and IntelliJ)
 lib/com_crashlytics_export_strings.xml
 lib/crashlytics.properties
@@ -116,3 +118,7 @@ project/fabric.properties
 #CMakeLists
 lib/cmake-build-debug/
 project/cmake-build-debug/
+lib/.idea/deployment.xml
+project/.idea/project.iml
+project/cmake-build-debug/CMakeCache.txt
+project/.idea/project.iml
