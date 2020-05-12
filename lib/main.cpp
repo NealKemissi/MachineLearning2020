@@ -16,6 +16,7 @@ extern "C" {
         return x + y;
     }
 
+
     DLLEXPORT int my_mul(int x, int y) {
         return x * y;
     }
@@ -23,7 +24,6 @@ extern "C" {
     DLLEXPORT int * linear_model_create(int input_dim) {
         int k = 0;
         auto array = new int[input_dim + 1];
-        int random;
         for (int index = 0; index < input_dim+1; index++)
         {
             array[k] = rand()%100+1;
@@ -32,14 +32,14 @@ extern "C" {
         return array;
     }
 
-    DLLEXPORT double linear_model_predict_regression(double* model, double* inputs, int inputs_size) {
+    DLLEXPORT double linear_model_predict_regression(double* model, double* inputs) {
         Vector3d v(model);
         Vector3d w(inputs);
         return v.tail(1).dot(w) + model[0];
     }
 
-    DLLEXPORT double linear_model_predict_classification(double* model, double* inputs, int inputs_size) {
-        return linear_model_predict_regression(model, inputs, inputs_size) >=0 ? 1.0 : -1.0;
+    DLLEXPORT double linear_model_predict_classification(double* model, double* inputs) {
+        return linear_model_predict_regression(model, inputs) >=0 ? 1.0 : -1.0;
     }
 
     DLLEXPORT void linear_model_train_classification(double* model,
@@ -54,7 +54,7 @@ extern "C" {
         // TODO : train Rosenbalt
         for (int it = 0; it < iterations_count; it++) {
             int k = rand() % dataset_length;
-            double g_x_k = linear_model_predict_classification(model, dataset_inputs[k], dataset_length);
+            double g_x_k = linear_model_predict_classification(model, dataset_inputs[k]);
             double grad = alpha * (dataset_expected_outputs[k] - g_x_k);
             model[0] += grad * 1;
             for (int i = 0; i < dataset_length; i++) {
@@ -64,18 +64,30 @@ extern "C" {
         }
     }
 
-    struct MLP {
-        int* npl;
-        int npl_size;
-        double*** w; //layer, i, j
-        double** x;
-        double** deltas;
-    };
-
-// mlp_model_create([2,3, 4, 1], 4)
-    DLLEXPORT struct MLP* mlp_model_create(int* npl, int npl_size) {
-        return 0;
+DLLEXPORT void linear_model_train_regression(double* model,
+        double* dataset_inputs,
+        int dataset_length,
+        int inputs_size,
+        double* dataset_expected_outputs,
+        int outputs_size) {
+    // TODO : train PseudoInverse moore
+    MatrixXd x(dataset_length, inputs_size+1);
+    MatrixXd y(dataset_length, 1);
+    for(int li = 0; li < dataset_length; li++) {
+        x(li, 0) = 1;
+        y(li, 0) = dataset_expected_outputs[li];
+        for(int col = 1; col < (inputs_size+1); col++) {
+            int i = (li * inputs_size) +(col - 1);
+            x(li, col) = dataset_inputs[i];
+        }
     }
+
+    MatrixXd w = (((x.transpose() * x).inverse()) * (x.transpose())) * y;
+
+    for(int i = 0; i <= inputs_size; i++) {
+        model[i] = w(i, 0);
+    }
+}
 
     DLLEXPORT double* lines_sum(double* lines, int lines_count, int line_size) {
         auto sums = new double[lines_count];
@@ -90,15 +102,16 @@ extern "C" {
         return sums;
     }
 
-//
-//    DLLEXPORT double linear_model_train_regression(double* model,
-//            double* dataset_inputs,
-//            int dataset_length,
-//            int inputs_size,
-//            double* dataset_expected_outputs,
-//            int outputs_size,
-//            int iterations_count,
-//            float alpha) {
-//    // TODO : train PseudoInverse moore
-//    }
+    struct MLP {
+        int* npl;
+        int npl_size;
+        double*** w; //layer, i, j
+        double** x;
+        double** deltas;
+    };
+
+    // mlp_model_create([2,3, 4, 1], 4)
+    DLLEXPORT struct MLP* mlp_model_create(int* npl, int npl_size) {
+        return NULL;
+    }
 }
