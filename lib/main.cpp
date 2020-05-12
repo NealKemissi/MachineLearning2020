@@ -43,7 +43,7 @@ extern "C" {
     }
 
     DLLEXPORT void linear_model_train_classification(double* model,
-            double** dataset_inputs,
+            double* dataset_inputs,
             int dataset_length,
             int inputs_size,
             double* dataset_expected_outputs,
@@ -54,13 +54,13 @@ extern "C" {
         // TODO : train Rosenbalt
         for (int it = 0; it < iterations_count; it++) {
             int k = rand() % dataset_length;
-            double g_x_k = linear_model_predict_classification(model, dataset_inputs[k]);
+            int position = inputs_size * k;
+            double g_x_k = linear_model_predict_classification(model, &dataset_inputs[position]);
             double grad = alpha * (dataset_expected_outputs[k] - g_x_k);
             model[0] += grad * 1;
             for (int i = 0; i < dataset_length; i++) {
-                model[i + 1] += grad * dataset_inputs[k][i];
+                model[i + 1] += grad * dataset_inputs[position + i];
             }
-
         }
     }
 
