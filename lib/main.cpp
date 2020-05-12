@@ -63,6 +63,33 @@ extern "C" {
 
         }
     }
+
+    struct MLP {
+        int* npl;
+        int npl_size;
+        double*** w; //layer, i, j
+        double** x;
+        double** deltas;
+    };
+
+// mlp_model_create([2,3, 4, 1], 4)
+    DLLEXPORT struct MLP* mlp_model_create(int* npl, int npl_size) {
+        return 0;
+    }
+
+    DLLEXPORT double* lines_sum(double* lines, int lines_count, int line_size) {
+        auto sums = new double[lines_count];
+        for(auto l = 0; l < lines_count; l++) {
+            auto line = lines + l*line_size;
+            auto sum = 0.0;
+            for(auto i = 0; i < lines_count; i++) {
+                sum+= line[i];
+            }
+            sums[l] = sum;
+        }
+        return sums;
+    }
+
 //
 //    DLLEXPORT double linear_model_train_regression(double* model,
 //            double* dataset_inputs,
