@@ -63,7 +63,7 @@ DLLEXPORT double * linear_model_create(int input_dim) {
     auto array = new double[input_dim + 1];
     for (int index = 0; index < input_dim+1; index++)
     {
-        array[index] = rand()*120641/15641%100+1;
+        array[index] = ((double)rand())/RAND_MAX;
     }
     return array;
 }
@@ -86,7 +86,6 @@ DLLEXPORT double linear_model_predict_classification(double* model, double* inpu
     return linear_model_predict_regression(model, inputs, inputs_size) >= 0 ? 1.0 : -1.0;
 }
 
-
 DLLEXPORT void linear_model_train_classification(double* model,
                                                  double* dataset_inputs,
                                                  int dataset_length,
@@ -97,7 +96,7 @@ DLLEXPORT void linear_model_train_classification(double* model,
                                                  float alpha) {
     // TODO : train Rosenbalt
     for (int it = 0; it < iterations_count; it++) {
-        int k = rand() % dataset_length;
+        int k = ((double)rand())/RAND_MAX * dataset_length;
         int position = inputs_size * k;
         double g_x_k = linear_model_predict_classification(model, &dataset_inputs[position], inputs_size);//
         double grad = alpha * (dataset_expected_outputs[k] - g_x_k);
@@ -231,7 +230,37 @@ DLLEXPORT void mlp_model_train_regression(struct MLP* model,
                                           int outputs_size,
                                           int iterations_count,
                                           double alpha) {
-        // TODO
+    for(int it = 0; it < iterations_count; it++) {
+        auto k = (int)floor(((double)std::min(rand(), RAND_MAX - 1)) / RAND_MAX * dataset_length);
+
+        auto inputs = dataset_inputs + k * inputs_size;
+        auto expected_outputs = dataset_expected_outputs + k * outputs_size;
+
+        mlp_propagation(model, inputs, false);
+
+        for(int j = 1; j < model->npl[model->npl_size-1] + 1; j++) {
+            model->deltas[model->npl_size -1][j] = (1 - pow(model->x[model->npl_size - 1][j], 2))
+                                                   * (model->x[model->npl_size - 1][j] - expected_outputs[j - 1]);
+        }
+
+        for(int l = model->npl_size-1; l >= 2; l--) {
+            for(int i = 1; i < model->npl[l - 1] + 1; i++) {
+                auto sum = 0.0;
+                for(int j = 1; j < model->npl[l] + 1; j++) {
+                    sum += model->w[l][i][j] * model->deltas[l][j];
+                }
+                model->deltas[l-1][i] = (1 - pow(model->x[l-1][i],2)) * sum;
+            }
+        }
+
+        for(int l = 1; l < model->npl_size; l++) {
+            for(int i = 0; i < model->npl[l-1]+1; i++) {
+                for(int j = 1; j < model->npl[l] + 1; j++) {
+                    model->w[l][i][j] -= alpha * model->x[l-1][i] * model->deltas[l][j];
+                }
+            }
+        }
+    }
 }
 
 
